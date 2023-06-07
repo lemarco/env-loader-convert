@@ -1,6 +1,6 @@
 [package]
 name = "env_loader_convert"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
 keywords = ["env-loader", "proc-macro"]
@@ -8,9 +8,6 @@ categories = ["env", "macro"]
 repository = "https://github.com/lemarco/env-loader-convert.git"
 description = "Macro for value conversion for env-loader crate. Syntax sugar."
 [dependencies]
-
-proc-macro2 = "1.0"
 quote = "1.0"
-syn = "2.0"
 [lib]
 proc-macro = true
