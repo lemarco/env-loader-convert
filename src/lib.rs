@@ -30,7 +30,13 @@ impl FromStr for KeyValue {
                 constraints: None,
             });
         }
-        let splitted_constraints = parts[1].split_ascii_whitespace().map(|cons| cons.trim());
+
+        let splitted_constraints: Vec<String> = parts[1]
+            .trim()
+            .split_ascii_whitespace()
+            .map(|cons| cons.trim().to_string())
+            .collect();
+
         let mut constraints = vec![];
 
         for constraint in splitted_constraints {
@@ -40,18 +46,29 @@ impl FromStr for KeyValue {
                     panic!("Wrong value for constraint Min provided");
                 }
                 constraints.push(Constraint::Min(value.unwrap()));
+                continue;
             } else if constraint.starts_with("max(") && constraint.ends_with(')') {
                 let value = constraint[4..constraint.len() - 1].trim().parse::<i64>();
                 if value.is_err() {
                     panic!("Wrong value for constraint Max provided");
                 }
                 constraints.push(Constraint::Max(value.unwrap()));
+                continue;
             } else if constraint.to_ascii_lowercase() == "notempty" {
                 constraints.push(Constraint::NotEmpty);
+                continue;
             } else if constraint.to_ascii_lowercase() == "optional" {
                 constraints.push(Constraint::Optional);
+                continue;
+            } else if constraint.starts_with("len(") && constraint.ends_with(')') {
+                let value = constraint[4..constraint.len() - 1].trim().parse::<usize>();
+                if value.is_err() {
+                    panic!("Wrong value for constraint Len provided");
+                }
+                constraints.push(Constraint::Len(value.unwrap()));
+                continue;
             } else {
-                panic!("Wrong constraint provided");
+                panic!("Wrong constraint syntax {key}: {constraint}.");
             }
         }
 
@@ -70,13 +87,17 @@ fn generate_mask(constraints: &Option<Vec<Constraint>>) -> String {
         "".to_string(),
         "".to_string(),
         "".to_string(),
+        "".to_string(),
+        "".to_string(),
     ];
     for cons in constraints {
         match cons {
-            Constraint::Max(val) => mask[0].push_str(&format!("{}", val)),
-            Constraint::Min(val) => mask[1].push_str(&format!("{}", val)),
+            Constraint::Max(val) => mask[0].push_str(&format!("{val}")),
+            Constraint::Min(val) => mask[1].push_str(&format!("{val}")),
             Constraint::Optional => mask[2].push('1'),
             Constraint::NotEmpty => mask[3].push('1'),
+
+            Constraint::Len(len) => mask[4].push_str(&format!("{len}")),
         }
     }
 

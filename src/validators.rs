@@ -4,6 +4,8 @@ pub(crate) enum Constraint {
     Max(i64),
     NotEmpty,
     Optional,
+
+    Len(usize),
 }
 
 pub(crate) fn validate_bool_constraints(key: &str, constraints: &[Constraint]) {
